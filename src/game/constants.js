@@ -64,7 +64,8 @@ export const ORB = {
   MAX_ENERGY: 100,
   RESPAWN: 2.6,         // 再出現までの秒数
   COUNT: 1,             // 同時に出現する数
-  FLOAT_RADIUS: 120,    // 中心からの浮遊半径
+  FLOAT_RADIUS: 210,    // 中心からの浮遊半径（ジャンプで届く高さ帯）
+  FLOAT_MIN: 150,       // 浮遊半径の最小
 };
 
 // マッチ

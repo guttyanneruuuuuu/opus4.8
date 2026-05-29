@@ -18,9 +18,9 @@ export class Orb {
   }
 
   _place() {
-    // 浮遊半径上のランダム位置
+    // 浮遊半径上のランダム位置（ジャンプで届く帯）
     const ang = randRange(0, TAU);
-    const rad = randRange(ORB.FLOAT_RADIUS * 0.4, ORB.FLOAT_RADIUS);
+    const rad = randRange(ORB.FLOAT_MIN, ORB.FLOAT_RADIUS);
     this.baseX = this.cx + Math.cos(ang) * rad;
     this.baseY = this.cy + Math.sin(ang) * rad;
     this.x = this.baseX;
