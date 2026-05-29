@@ -304,6 +304,80 @@ export class GameEngine {
     if (this.onRoundChange) this.onRoundChange(this.scores, this.roundNumber);
   }
 
+  // ============== ネット同期 ==============
+  // ホスト: 描画に必要な最小限の状態を抽出
+  serialize() {
+    return {
+      st: this.state,
+      cd: this.countdown,
+      rt: this.roundTime,
+      sc: this.scores,
+      rn: this.roundNumber,
+      rw: this.roundWinner,
+      mw: this.matchWinner,
+      sk: this.shake,
+      pl: this.players.map((p) => ({
+        th: p.theta, r: p.r, fc: p.facing, hp: p.hp, en: p.energy,
+        gd: p.guard, ig: p.isGuarding ? 1 : 0, al: p.alive ? 1 : 0,
+        sq: p.squash, hf: p.hitFlash, iv: p.invuln, dt: p.dashTimer,
+        eb: p.eyeBlink, ap: p.animPhase,
+      })),
+      pr: this.projectiles.map((pr) => ({
+        x: pr.x, y: pr.y, vx: pr.vx, vy: pr.vy, su: pr.isSuper ? 1 : 0, o: pr.owner, sp: pr.spin,
+      })),
+      ob: this.orbs.map((o) => ({ x: o.x, y: o.y, a: o.active ? 1 : 0, sc: o.scale, sp: o.spin, bp: o.bobPhase })),
+    };
+  }
+
+  // ゲスト: 受信状態を反映（描画専用）
+  applyState(s) {
+    if (!s) return;
+    this.state = s.st;
+    this.countdown = s.cd;
+    this.roundTime = s.rt;
+    this.scores = s.sc;
+    this.roundNumber = s.rn;
+    this.roundWinner = s.rw;
+    this.matchWinner = s.mw;
+    this.shake = s.sk;
+    this.shakeX = randRange(-this.shake, this.shake);
+    this.shakeY = randRange(-this.shake, this.shake);
+
+    for (let i = 0; i < 2; i++) {
+      const p = this.players[i], d = s.pl[i];
+      if (!d) continue;
+      p.theta = d.th; p.r = d.r; p.facing = d.fc; p.hp = d.hp; p.energy = d.en;
+      p.guard = d.gd; p.isGuarding = !!d.ig; p.alive = !!d.al;
+      p.squash = d.sq; p.hitFlash = d.hf; p.invuln = d.iv; p.dashTimer = d.dt;
+      p.eyeBlink = d.eb; p.animPhase = d.ap;
+    }
+
+    // 発射体は描画用に再構築
+    this.projectiles = (s.pr || []).map((d) => {
+      const pal = this.players[d.o].palette;
+      const pr = new Projectile(d.o, d.x, d.y, d.vx, d.vy, !!d.su, pal, this.particles);
+      pr.spin = d.sp;
+      return pr;
+    });
+
+    // オーブ
+    if (s.ob) {
+      for (let i = 0; i < this.orbs.length && i < s.ob.length; i++) {
+        const o = this.orbs[i], d = s.ob[i];
+        o.x = d.x; o.y = d.y; o.active = !!d.a; o.scale = d.sc; o.spin = d.sp; o.bobPhase = d.bp;
+      }
+    }
+  }
+
+  // ゲスト: ローカルでパーティクルとBGアニメだけ進める
+  updateClientVisual(dt) {
+    this.bgPhase += dt * 0.3;
+    this.cloudOffset += dt * 8;
+    this.shake *= 0.86;
+    if (this.shake < 0.2) this.shake = 0;
+    this.particles.update(dt);
+  }
+
   // ============== 描画 ==============
   draw() {
     const ctx = this.ctx;
