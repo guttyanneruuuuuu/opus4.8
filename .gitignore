@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+supervisord.log
+supervisor.sock
+supervisord.pid
+.vscode/
