@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#fff4e0">
+  <meta name="description" content="Orbit Clash - 明るく爽やかな重力リング対戦アクション">
+  <title>🪐 Orbit Clash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== タイトル画面 ===== -->
+    <section id="screen-title" class="screen active">
+      <div class="title-deco deco-1"></div>
+      <div class="title-deco deco-2"></div>
+      <div class="title-deco deco-3"></div>
+      <div class="title-content">
+        <div class="logo">
+          <div class="logo-orbit">
+            <span class="logo-planet"></span>
+            <span class="logo-moon"></span>
+          </div>
+          <h1 class="logo-text">Orbit<br><span>Clash</span></h1>
+        </div>
+        <p class="tagline">ぐるぐるアリーナで対戦バトル！</p>
+        <button id="btn-start" class="btn btn-primary btn-big">
+          <span>はじめる</span>
+        </button>
+        <p class="credit">明るく爽やかな重力リング・アクション</p>
+      </div>
+    </section>
+
+    <!-- ===== モード選択 ===== -->
+    <section id="screen-mode" class="screen">
+      <div class="panel">
+        <h2 class="panel-title">モードをえらぶ</h2>
+        <div class="mode-list">
+          <button id="mode-ai" class="mode-card mode-ai">
+            <span class="mode-icon">🤖</span>
+            <span class="mode-label">AI対戦</span>
+            <span class="mode-desc">コンピューターと勝負</span>
+          </button>
+          <button id="mode-online" class="mode-card mode-online">
+            <span class="mode-icon">🌈</span>
+            <span class="mode-label">友達と対戦</span>
+            <span class="mode-desc">コードを共有してオンライン対戦</span>
+          </button>
+          <button id="mode-local" class="mode-card mode-local">
+            <span class="mode-icon">🎮</span>
+            <span class="mode-label">2人対戦</span>
+            <span class="mode-desc">1台で仲良く対戦（キーボード）</span>
+          </button>
+        </div>
+        <button class="btn btn-ghost" data-back="title">← もどる</button>
+      </div>
+    </section>
+
+    <!-- ===== AI難易度選択 ===== -->
+    <section id="screen-ai" class="screen">
+      <div class="panel">
+        <h2 class="panel-title">むずかしさ</h2>
+        <div class="diff-list">
+          <button class="diff-btn diff-easy" data-diff="easy">
+            <span class="diff-star">★☆☆</span>
+            <span class="diff-name">やさしい</span>
+          </button>
+          <button class="diff-btn diff-normal" data-diff="normal">
+            <span class="diff-star">★★☆</span>
+            <span class="diff-name">ふつう</span>
+          </button>
+          <button class="diff-btn diff-hard" data-diff="hard">
+            <span class="diff-star">★★★</span>
+            <span class="diff-name">つよい</span>
+          </button>
+        </div>
+        <button class="btn btn-ghost" data-back="mode">← もどる</button>
+      </div>
+    </section>
+
+    <!-- ===== オンライン ===== -->
+    <section id="screen-online" class="screen">
+      <div class="panel">
+        <h2 class="panel-title">友達と対戦</h2>
+        <div class="online-tabs">
+          <button id="online-host-tab" class="tab-btn">部屋を作る</button>
+          <button id="online-join" class="tab-btn">部屋に入る</button>
+        </div>
+
+        <div id="host-panel" class="online-sub show">
+          <p class="online-hint">「部屋を作成」を押して、表示されたコードを友達に教えてね！</p>
+          <button id="online-host" class="btn btn-primary">部屋を作成</button>
+          <div id="host-waiting" class="host-waiting">
+            <p class="code-label">ルームコード</p>
+            <div id="room-code-display" class="room-code">----</div>
+            <button id="copy-code" class="btn btn-ghost btn-sm">コードをコピー</button>
+            <div class="waiting-spinner"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+
+        <div id="join-panel" class="online-sub">
+          <p class="online-hint">友達からもらった4文字のコードを入力してね！</p>
+          <input id="join-code-input" class="code-input" type="text" maxlength="4" placeholder="ABCD" autocomplete="off" autocapitalize="characters">
+          <button id="join-confirm" class="btn btn-primary">参加する</button>
+        </div>
+
+        <p id="online-status" class="online-status"></p>
+        <button class="btn btn-ghost" data-back="mode">← もどる</button>
+      </div>
+    </section>
+
+    <!-- ===== ゲーム画面 ===== -->
+    <section id="screen-game" class="screen">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- HUD -->
+      <div id="hud">
+        <div class="hud-top">
+          <div class="hud-player hud-left">
+            <div class="hud-name" id="hud-p1-name">PLAYER 1</div>
+            <div class="hud-bar-wrap">
+              <div class="hud-hp-bg"><div class="hud-hp p1" id="hud-p1-hp"></div></div>
+            </div>
+            <div class="hud-energy-wrap p1" id="hud-p1-energy-wrap">
+              <div class="hud-energy" id="hud-p1-energy"></div>
+              <span class="energy-spark">✦</span>
+            </div>
+            <div class="hud-score" id="hud-p1-score">0</div>
+          </div>
+
+          <div class="hud-center">
+            <div class="hud-timer-ring">
+              <div id="hud-timer">60</div>
+            </div>
+            <div class="hud-ping-wrap"><span id="hud-ping"></span></div>
+          </div>
+
+          <div class="hud-player hud-right">
+            <div class="hud-name" id="hud-p2-name">CPU</div>
+            <div class="hud-bar-wrap">
+              <div class="hud-hp-bg"><div class="hud-hp p2" id="hud-p2-hp"></div></div>
+            </div>
+            <div class="hud-energy-wrap p2" id="hud-p2-energy-wrap">
+              <div class="hud-energy" id="hud-p2-energy"></div>
+              <span class="energy-spark">✦</span>
+            </div>
+            <div class="hud-score" id="hud-p2-score">0</div>
+          </div>
+        </div>
+
+        <div class="hud-corner">
+          <button id="toggle-sfx" class="icon-btn">🔊</button>
+          <button id="toggle-music" class="icon-btn">🎵</button>
+          <button id="btn-quit" class="icon-btn">✕</button>
+        </div>
+      </div>
+
+      <!-- タッチコントロール挿入先 -->
+      <div id="touch-root"></div>
+    </section>
+
+    <!-- ===== リザルト ===== -->
+    <section id="screen-result" class="screen">
+      <div class="result-deco"></div>
+      <div id="result-card" class="result-card win">
+        <h2 id="result-title">YOU WIN!</h2>
+        <p id="result-sub">おみごと！</p>
+        <div class="result-score-wrap">
+          <span class="result-score-label">スコア</span>
+          <div id="result-score" class="result-score">2 - 1</div>
+        </div>
+        <div class="result-actions">
+          <button id="result-rematch" class="btn btn-primary">もう一回</button>
+          <button id="result-menu" class="btn btn-ghost">メニューへ</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- PeerJS (WebRTC) -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <!-- ゲーム本体 -->
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
